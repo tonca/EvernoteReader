@@ -7,8 +7,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * 
  * @author Antonio
- */ 
+ */
 
 public class Enex2Text extends JFrame implements WindowListener, ActionListener {
 
@@ -43,7 +44,8 @@ public class Enex2Text extends JFrame implements WindowListener, ActionListener 
         setVisible(true);
     }
 
-    private static void follyParser(NodeList childNodes, OutputStreamWriter out) {
+    private void XMLParser(NodeList childNodes, OutputStreamWriter out) {
+        String extracted = "";
         for (int i = 0; i < childNodes.getLength(); i++) {
             try {
                 switch (childNodes.item(i).getNodeName()) {
@@ -53,11 +55,25 @@ public class Enex2Text extends JFrame implements WindowListener, ActionListener 
                     case "content":
                         out.append("<div id='content'>" + childNodes.item(i).getTextContent() + "</div>");
                         break;
-                    /* add your tags */
+                    case "extracted":
+                        extracted = childNodes.item(i).getTextContent();
+                        out.append("<div id='extracted'>Created: " + extracted.substring(9, 11) + ":" + extracted.substring(11, 13) + ":" + extracted.substring(13, 15) + "   " + extracted.substring(6, 8) + "/" + extracted.substring(4, 6) + "/" + extracted.substring(0, 4) + "</div>");
+                        break;
+                    case "updated":
+                        extracted = childNodes.item(i).getTextContent();
+                        out.append("<div id='updated'>Updated: " + extracted.substring(9, 11) + ":" + extracted.substring(11, 13) + ":" + extracted.substring(13, 15) + "   " + extracted.substring(6, 8) + "/" + extracted.substring(4, 6) + "/" + extracted.substring(0, 4) + "</div>");
+                        break;
+                    case "latitude":
+                        out.append("<div id='latitude'>Latitude: " + childNodes.item(i).getTextContent() + "</div>");
+                        break;
+                    case "longitude":
+                        out.append("<div id='longitude'>Longitude: " + childNodes.item(i).getTextContent() + "</div><br />");
+                        break;
                     default:
                 }
-                follyParser(childNodes.item(i).getChildNodes(), out);
+                XMLParser(childNodes.item(i).getChildNodes(), out);
             } catch (IOException exception) {
+                JOptionPane.showMessageDialog(this, "Error while parsing the file!");
             }
         }
     }
@@ -110,11 +126,14 @@ public class Enex2Text extends JFrame implements WindowListener, ActionListener 
                     org.w3c.dom.Document doc = dBuilder.parse(file);
                     if (doc.hasChildNodes()) {
                         out.append("<html><title>" + file.getName() + "</title><body>");
-                        follyParser(doc.getChildNodes(), out);
+                        XMLParser(doc.getChildNodes(), out);
                         out.append("</body></html>");
                     }
                     out.flush();
                     out.close();
+                    text.setText("Select a file...");
+                    file = null;
+                    JOptionPane.showMessageDialog(this, "Converted!");
                 } catch (ParserConfigurationException | SAXException | IOException exception) {
                     JOptionPane.showMessageDialog(this, "Error while parsing the file!");
                 }
