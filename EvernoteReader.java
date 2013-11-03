@@ -53,7 +53,8 @@ public class Enex2Text extends JFrame implements WindowListener, ActionListener 
                         out.append("<div id='title'>" + childNodes.item(i).getTextContent() + "</div>");
                         break;
                     case "content":
-                        out.append("<div id='content'>" + childNodes.item(i).getTextContent() + "</div>");
+                        extracted = childNodes.item(i).getTextContent();
+                        out.append("<div id='content'>" + extracted.substring(extracted.indexOf("<div>") + 5, extracted.length() - 27) + "</div>");
                         break;
                     case "extracted":
                         extracted = childNodes.item(i).getTextContent();
@@ -125,7 +126,7 @@ public class Enex2Text extends JFrame implements WindowListener, ActionListener 
                     DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     org.w3c.dom.Document doc = dBuilder.parse(file);
                     if (doc.hasChildNodes()) {
-                        out.append("<html><title>" + file.getName() + "</title><body>");
+                        out.append("<html><head><title>" + file.getName() + "</title><meta charset=\"UTF-8\"></head><body>");
                         XMLParser(doc.getChildNodes(), out);
                         out.append("</body></html>");
                     }
